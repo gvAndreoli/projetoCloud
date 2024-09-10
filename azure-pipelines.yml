@@ -9,11 +9,23 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+resources:
+  - repo: self
+variables:
+  imagePullSecret: 'regcred'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+   
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'DockerConnection'
+        repository: 'repositorioname/projeto'
+        command: 'buildAndPush'
+        tags: '$(Build.BuildId)'
+        Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
